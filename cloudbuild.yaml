@@ -38,6 +38,8 @@ steps:
       - '--region=${_REGION}'
       - '--platform=managed'
       - '--allow-unauthenticated'
+      - '--memory=512Mi'
+      - '--cpu=1'
       - '--update-secrets=DATABASE_URL=DATABASE_URL:latest,SECRET_KEY=SECRET_KEY:latest,CORS_ORIGINS=CORS_ORIGINS:latest'
       - '--set-env-vars=PORT=8000'
 
@@ -71,6 +73,8 @@ steps:
       - '--region=${_REGION}'
       - '--platform=managed'
       - '--allow-unauthenticated'
+      - '--memory=512Mi'
+      - '--cpu=1'
 
 substitutions:
   _REGION: us-central1
