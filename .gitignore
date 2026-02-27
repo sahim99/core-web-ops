@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+backend/venv/
+backend/.venv/
+
+# Environment variables — never commit secrets
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+frontend/dist/
+
+# Logs
+*.log
+
+# Database files
+*.db
+*.sqlite3
+
+# Dev-only backend scripts (debug, fix, seed, sync — never commit)
+backend/debug_*.py
+backend/fix_*.py
+backend/seed*.py
+backend/sync_*.py
+backend/test_*.py
+backend/check_*.py
+backend/create_demo_*.py
+backend/clear_db.py
+backend/run_engine.py
+
+# Dev scratch / snippet files
+backend/app/api/automation_failures_snippet.py
+frontend/src/api/automation_failures_snippet.js
+
+# Debug/temp output files
+debug_output.txt
+test_echo.txt
+verification_output.txt
+test_results.txt
+*.tmp

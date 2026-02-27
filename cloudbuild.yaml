@@ -1,0 +1,81 @@
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/DATABASE_URL/versions/latest
+      env: DATABASE_URL
+    - versionName: projects/$PROJECT_ID/secrets/SECRET_KEY/versions/latest
+      env: SECRET_KEY
+    - versionName: projects/$PROJECT_ID/secrets/CORS_ORIGINS/versions/latest
+      env: CORS_ORIGINS
+    - versionName: projects/$PROJECT_ID/secrets/VITE_API_URL/versions/latest
+      env: VITE_API_URL
+
+steps:
+  # ── Backend ────────────────────────────────────────────────────────
+
+  # Build backend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/backend:$COMMIT_SHA'
+      - './backend'
+
+  # Push backend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/backend:$COMMIT_SHA'
+
+  # Deploy backend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    secretEnv: ['DATABASE_URL', 'SECRET_KEY', 'CORS_ORIGINS']
+    args:
+      - 'run'
+      - 'deploy'
+      - 'corewebops-backend'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/backend:$COMMIT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--update-secrets=DATABASE_URL=DATABASE_URL:latest,SECRET_KEY=SECRET_KEY:latest,CORS_ORIGINS=CORS_ORIGINS:latest'
+      - '--set-env-vars=PORT=8000'
+
+  # ── Frontend ───────────────────────────────────────────────────────
+
+  # Build frontend image (VITE_API_URL injected at build time from Secret Manager)
+  - name: 'gcr.io/cloud-builders/docker'
+    secretEnv: ['VITE_API_URL']
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/frontend:$COMMIT_SHA'
+      - '--build-arg'
+      - 'VITE_API_URL=$$VITE_API_URL'
+      - './frontend'
+
+  # Push frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/frontend:$COMMIT_SHA'
+
+  # Deploy frontend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'corewebops-frontend'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/frontend:$COMMIT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+
+substitutions:
+  _REGION: us-central1
+  _REPO: corewebops
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+

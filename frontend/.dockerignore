@@ -1,0 +1,9 @@
+# Frontend Docker build - exclude dev files
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.vscode/
+.idea/
+README.md

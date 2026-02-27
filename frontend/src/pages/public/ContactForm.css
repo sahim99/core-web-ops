@@ -1,0 +1,83 @@
+.public-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: 20px;
+  position: relative;
+}
+
+.public-container {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(22, 22, 37, 0.8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 40px 36px;
+  backdrop-filter: blur(24px);
+  box-shadow: var(--shadow-lg);
+}
+
+.public-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.public-logo {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-400));
+  border-radius: var(--radius-md);
+  font-size: 1.4rem;
+  margin: 0 auto 16px;
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.3);
+}
+
+.public-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.public-header p {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+
+.public-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.public-success {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.public-success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 2px solid var(--success);
+  border-radius: 50%;
+  font-size: 1.5rem;
+  color: var(--success);
+  margin-bottom: 16px;
+}
+
+.public-success h2 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.public-success p {
+  color: var(--text-secondary);
+}

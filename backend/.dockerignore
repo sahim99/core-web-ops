@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment variables - never commit secrets
+.env
+.env.local
+
+# Local database files
+*.db
+*.sqlite3
+
+# Debug and temporary scripts (dev only)
+debug_*.py
+check_*.py
+fix_*.py
+verify_*.py
+test_*.py
+seed*.py
+clear_db.py
+run_engine.py
+
+# Logs
+*.log
+*.txt
+
+# IDE
+.vscode/
+.idea/
