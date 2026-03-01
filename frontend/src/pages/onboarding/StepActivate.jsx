@@ -21,6 +21,7 @@ export default function StepActivate() {
   ]
   
   const allValid = checks.every(c => c.valid)
+  const anyMissing = checks.some(c => !c.valid)
 
   const handleActivate = async () => {
     setLoading(true)
@@ -77,11 +78,16 @@ export default function StepActivate() {
         </div>
       )}
 
+      {anyMissing && (
+        <p className="text-xs text-center text-[var(--text-muted)] mb-4">
+          Missing items can be set up later from your dashboard.
+        </p>
+      )}
       <button 
         onClick={handleActivate}
-        disabled={!allValid || loading}
+        disabled={loading}
         className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center transition-all shadow-lg
-          ${allValid && !loading 
+          ${ !loading 
             ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-[var(--text-primary)] shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-1' 
             : 'bg-slate-800 text-[var(--text-secondary)] cursor-not-allowed border border-slate-700'}`}
       >

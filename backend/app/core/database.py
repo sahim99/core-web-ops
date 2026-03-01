@@ -13,8 +13,10 @@ from app.core.config import settings
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
+    pool_size=1,       # Cloud Run: 2 workers × 1 = 2 base connections
+    max_overflow=2,    # burst up to 3 per worker = 6 max total — safe for Supabase free tier
+    pool_timeout=30,
+    pool_recycle=1800, # recycle stale connections every 30 min
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

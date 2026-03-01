@@ -29,7 +29,6 @@ run_engine.py
 
 # Logs
 *.log
-*.txt
 
 # IDE
 .vscode/

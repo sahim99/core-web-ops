@@ -71,3 +71,10 @@ test_echo.txt
 verification_output.txt
 test_results.txt
 *.tmp
+
+# Loose screenshot files dumped in project root (docs/screenshots/ IS committed)
+/Screenshot*.png
+/Screenshot*.jpg
+
+# Pytest
+.pytest_cache/

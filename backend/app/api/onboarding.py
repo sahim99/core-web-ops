@@ -68,13 +68,13 @@ def activate_workspace(
             detail="Workspace is already active",
         )
 
-    # Validate before activation
-    missing = OnboardingValidator.validate(workspace.id, db)
-    if missing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "Cannot activate workspace", "missing": missing},
-        )
+    # Validate before activation (optional steps no longer block launch)
+    # missing = OnboardingValidator.validate(workspace.id, db)
+    # if missing:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail={"message": "Cannot activate workspace", "missing": missing},
+    #     )
 
     workspace.status = WorkspaceStatus.ACTIVE
     db.commit()

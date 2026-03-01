@@ -44,16 +44,16 @@ def _set_auth_cookies(response: Response, access_token: str, csrf_token: str):
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # Set to True in HTTPS production
-        samesite="lax",
+        secure=True,       # Required: Cloud Run serves HTTPS only
+        samesite="none",   # Required: frontend/backend are different *.run.app domains
         max_age=60 * 60 * 24
     )
     response.set_cookie(
         key="csrf_token",
         value=csrf_token,
-        httponly=False,  # JS-readable for X-CSRF-Token header
-        secure=False,
-        samesite="lax",
+        httponly=False,    # JS-readable for X-CSRF-Token header
+        secure=True,       # Required for SameSite=None
+        samesite="none",   # Required: cross-origin cookie
         max_age=60 * 60 * 24
     )
 

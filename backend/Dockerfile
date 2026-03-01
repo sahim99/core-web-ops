@@ -20,10 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Cloud Run injects PORT env variable
-ENV PORT=8000
-
-EXPOSE ${PORT}
+# Cloud Run injects PORT at runtime — do NOT hardcode it here
+EXPOSE 8080
 
 # Production entrypoint – gunicorn with uvicorn workers
 CMD exec gunicorn \
