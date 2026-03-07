@@ -112,9 +112,12 @@ def register(response: Response, payload: UserCreate, background_tasks: Backgrou
         {} 
     )
 
+    user_resp = UserResponse.model_validate(user)
+    user_resp.csrf_token = csrf_token
+
     return TokenWithUser(
         access_token="cookie-based", 
-        user=UserResponse.model_validate(user),
+        user=user_resp,
     )
 
 
@@ -156,9 +159,12 @@ def login(response: Response, payload: UserLogin, background_tasks: BackgroundTa
             {}
         )
 
+    user_resp = UserResponse.model_validate(user)
+    user_resp.csrf_token = csrf_token
+
     return TokenWithUser(
         access_token="cookie-based", 
-        user=UserResponse.model_validate(user),
+        user=user_resp,
     )
 
 
@@ -232,9 +238,12 @@ def demo_login(response: Response, db: Session = Depends(get_db)):
     csrf_token = generate_csrf_token()
     _set_auth_cookies(response, access_token, csrf_token)
 
+    user_resp = UserResponse.model_validate(user)
+    user_resp.csrf_token = csrf_token
+
     return TokenWithUser(
         access_token="cookie-based",
-        user=UserResponse.model_validate(user),
+        user=user_resp,
     )
 
 
@@ -323,9 +332,12 @@ def staff_login(response: Response, payload: StaffLogin, db: Session = Depends(g
     csrf_token = generate_csrf_token()
     _set_auth_cookies(response, access_token, csrf_token)
 
+    user_resp = UserResponse.model_validate(staff)
+    user_resp.csrf_token = csrf_token
+
     return TokenWithUser(
         access_token="cookie-based",
-        user=UserResponse.model_validate(staff),
+        user=user_resp,
     )
 
 
@@ -338,6 +350,8 @@ def logout(response: Response):
 
 
 @router.get("/me", response_model=UserResponse)
-def get_me(current_user: User = Depends(get_current_user)):
+def get_me(request: Request, current_user: User = Depends(get_current_user)):
     """Return the currently authenticated user (from cookie)."""
-    return UserResponse.model_validate(current_user)
+    user_resp = UserResponse.model_validate(current_user)
+    user_resp.csrf_token = request.cookies.get("csrf_token")
+    return user_resp

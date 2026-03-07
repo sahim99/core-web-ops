@@ -13,9 +13,13 @@ export function AuthProvider({ children }) {
   const loadUser = useCallback(async () => {
     try {
       const { data } = await getMe()
+      if (data.csrf_token) {
+        localStorage.setItem('csrf_token', data.csrf_token)
+      }
       setUser(data)
     } catch (error) {
       setUser(null)
+      localStorage.removeItem('csrf_token')
     } finally {
       setLoading(false)
     }
@@ -64,6 +68,7 @@ export function AuthProvider({ children }) {
        console.error("Logout failed", error)
     } finally {
       setUser(null)
+      localStorage.removeItem('csrf_token')
     }
   }
 

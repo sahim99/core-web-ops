@@ -8,12 +8,7 @@ const api = axios.create({
   withCredentials: true, // Send cookies with every request
 })
 
-// Helper to get cookie by name
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-}
+// Removed getCookie because cross-origin cookies cannot be read by JS document.cookie
 
 // Request interceptor: CSRF token + GET-only trailing slash normalisation
 // NOTE: Only GET requests get a trailing slash appended.
@@ -31,8 +26,9 @@ api.interceptors.request.use((config) => {
   }
 
   // Set CSRF token for unsafe (mutating) methods
-  const csrfToken = getCookie('csrf_token')
-  if (csrfToken && ['post', 'put', 'delete', 'patch'].includes(config.method)) {
+  const csrfToken = localStorage.getItem('csrf_token')
+  const method = config.method?.toLowerCase()
+  if (csrfToken && ['post', 'put', 'delete', 'patch'].includes(method)) {
     config.headers['X-CSRF-Token'] = csrfToken
   }
   return config

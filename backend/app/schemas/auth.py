@@ -63,6 +63,7 @@ class UserResponse(BaseModel):
     permissions: Optional[PermissionsPayload] = None
     staff_id: Optional[str] = None
     owner_id: Optional[int] = None
+    csrf_token: Optional[str] = None
 
     class Config:
         from_attributes = True
