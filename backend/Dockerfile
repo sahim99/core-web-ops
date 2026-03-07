@@ -24,6 +24,8 @@ COPY . .
 EXPOSE 8080
 
 # Production entrypoint – gunicorn with uvicorn workers
+# --forwarded-allow-ips='*' tells gunicorn/uvicorn to trust X-Forwarded-Proto
+# from the Cloud Run load balancer so HTTPS redirects (307s) use https:// not http://
 CMD exec gunicorn \
     --bind 0.0.0.0:${PORT} \
     --workers 2 \
@@ -31,4 +33,5 @@ CMD exec gunicorn \
     --timeout 120 \
     --access-logfile - \
     --error-logfile - \
+    --forwarded-allow-ips='*' \
     app.main:app

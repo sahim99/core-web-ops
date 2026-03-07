@@ -7,7 +7,6 @@ import { useRole } from '../../hooks/useRole'
 import { useAuth } from '../../hooks/useAuth'
 import { getOwnerOverview } from '../../api/dashboard.api'
 import { DASHBOARD_CONFIG } from '../../config/dashboard.config'
-import { DEMO_DATA } from '../../config/demoData'
 
 // Widgets
 import RevenueChart from '../../components/dashboard/RevenueChart'
@@ -155,12 +154,6 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async (r) => {
-    // In demo mode, skip the API and use pre-seeded fake data
-    if (isDemo) {
-      setData(DEMO_DATA)
-      setLoading(false)
-      return
-    }
     try {
       const res = await getOwnerOverview(r)
       setData(res.data)
@@ -169,7 +162,7 @@ function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }, [isDemo])
+  }, [])
 
   useEffect(() => {
     if (!isOwner) { setLoading(false); return }

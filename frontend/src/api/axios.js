@@ -15,15 +15,27 @@ function getCookie(name) {
   if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-// Add CSRF token to every request
+// Request interceptor: CSRF token + GET-only trailing slash normalisation
+// NOTE: Only GET requests get a trailing slash appended.
+// POST/PUT/DELETE/PATCH paths (e.g. /auth/demo-login) are never modified,
+// preventing FastAPI 307 redirects that strip cookies and cause mixed-content blocks.
 api.interceptors.request.use((config) => {
-  // We don't need to manually set Authorization header anymore (cookies handle it)
-  // But we DO need to set CSRF token for unsafe methods
-  const csrfToken = getCookie('csrf_token');
-  if (csrfToken && ['post', 'put', 'delete', 'patch'].includes(config.method)) {
-    config.headers['X-CSRF-Token'] = csrfToken;
+  // Append trailing slash ONLY for GET requests to avoid 307 redirect on list endpoints
+  if (
+    config.method === 'get' &&
+    config.url &&
+    !config.url.endsWith('/') &&
+    !config.url.includes('?')
+  ) {
+    config.url += '/'
   }
-  return config;
+
+  // Set CSRF token for unsafe (mutating) methods
+  const csrfToken = getCookie('csrf_token')
+  if (csrfToken && ['post', 'put', 'delete', 'patch'].includes(config.method)) {
+    config.headers['X-CSRF-Token'] = csrfToken
+  }
+  return config
 },
   (error) => Promise.reject(error)
 )
@@ -34,10 +46,15 @@ import { toast } from 'react-hot-toast'
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Demo Mode Read-Only Protection
+    // Demo Mode Read-Only Protection — simulate success instead of erroring
     if (error.response?.status === 403 && error.response.data?.detail?.includes('Demo mode')) {
-      toast.error('Action disabled in Live Demo mode', { duration: 4000 });
-      return Promise.reject(error);
+      toast('This action is simulated in demo mode.', {
+        icon: '🎯',
+        duration: 3000,
+        style: { background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155' },
+      });
+      // Return a fake successful response so the UI doesn't break
+      return Promise.resolve({ data: {}, status: 200, simulated: true });
     }
 
     // Only redirect if NOT on login page to avoid infinite loops

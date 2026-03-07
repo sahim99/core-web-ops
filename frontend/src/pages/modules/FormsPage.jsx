@@ -45,7 +45,9 @@ function FormsPage() {
       }
     } catch (err) {
       console.error('Failed to fetch forms', err)
-      toast.error('Failed to load forms')
+      const msg = err.response?.data?.detail || err.response?.data?.error?.message || 'Could not connect to server'
+      toast.error(`Forms: ${msg}`)
+      setForms([])
     } finally {
       setLoading(false)
     }

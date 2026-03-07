@@ -51,7 +51,9 @@ function ContactsPage() {
       setContacts(res.data)
     } catch (err) {
       console.error('Failed to fetch contacts', err)
-      toast.error('Failed to load contacts')
+      const msg = err.response?.data?.detail || err.response?.data?.error?.message || 'Could not connect to server'
+      toast.error(`Contacts: ${msg}`)
+      setContacts([])
     } finally {
       setLoading(false)
     }

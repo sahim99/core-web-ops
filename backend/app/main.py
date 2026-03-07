@@ -89,6 +89,20 @@ def health_check(db: Session = Depends(get_db)):
         )
 
 
+
+# ── Auto-seed demo data on startup ───────────────────────────────
+@app.on_event("startup")
+def startup_seed_demo():
+    """Auto-create demo workspace and seed data if missing."""
+    import logging
+    logger = logging.getLogger(__name__)
+    try:
+        from scripts.seed_demo_data import run_seed
+        run_seed()
+    except Exception as e:
+        logger.warning(f"Demo seed skipped (non-fatal): {e}")
+
+
 # ── Dev server ────────────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn

@@ -34,7 +34,10 @@ function AlertsPage() {
       setLastChecked(new Date())
     } catch (err) {
       console.error('Failed to fetch alerts', err)
-      toast.error('Could not refresh alerts')
+      const msg = err.response?.data?.detail || err.response?.data?.error?.message || 'Could not connect to server'
+      toast.error(`Alerts: ${msg}`)
+      setAlerts([])
+      setUnreadCount(0)
     } finally {
       if (!isBackground) setLoading(false)
     }

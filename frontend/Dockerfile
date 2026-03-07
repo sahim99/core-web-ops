@@ -9,8 +9,9 @@ RUN npm ci
 COPY . .
 
 # Inject VITE_API_URL at build time (passed via --build-arg in cloudbuild.yaml)
+# Vite reads from .env.production during `npm run build`, NOT from process.env
 ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+RUN echo "VITE_API_URL=${VITE_API_URL}" > .env.production
 
 RUN npm run build
 

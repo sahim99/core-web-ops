@@ -72,9 +72,15 @@ verification_output.txt
 test_results.txt
 *.tmp
 
-# Loose screenshot files dumped in project root (docs/screenshots/ IS committed)
+# Root-level scratch/test scripts (not backend/ — those covered above)
+test_prod.py
+test_api.py
+
+# Loose screenshot / media files dumped in project root (docs/screenshots/ IS committed)
 /Screenshot*.png
 /Screenshot*.jpg
+/Screenshot *.png
+/Screenshot *.jpg
 
 # Pytest
 .pytest_cache/
