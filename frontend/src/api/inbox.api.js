@@ -2,7 +2,7 @@ import api from './axios'
 
 export const listConversations = (params) => api.get('/inbox', { params })
 export const getConversation = (id) => api.get(`/inbox/${id}`)
-export const createConversation = (data) => api.post('/inbox', data)
+export const createConversation = (data) => api.post('/inbox/', data)
 export const deleteConversation = (id) => api.delete(`/inbox/${id}`)
 
 // Messages

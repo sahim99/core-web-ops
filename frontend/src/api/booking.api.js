@@ -5,7 +5,7 @@ export const listBookings = (status = '', skip = 0, limit = 50) =>
 
 export const getBooking = (id) => api.get(`/bookings/${id}`)
 
-export const createBooking = (data) => api.post('/bookings', data)
+export const createBooking = (data) => api.post('/bookings/', data)
 
 // Confirm booking
 export const confirmBooking = (id) => api.post(`/bookings/${id}/confirm`, {})

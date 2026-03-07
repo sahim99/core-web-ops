@@ -7,7 +7,7 @@ export const listForms = (skip = 0, limit = 50) =>
 
 export const getForm = (id) => api.get(`/forms/${id}`)
 
-export const createForm = (data) => api.post('/forms', data)
+export const createForm = (data) => api.post('/forms/', data)
 
 export const updateForm = (id, data) => api.put(`/forms/${id}`, data)
 
