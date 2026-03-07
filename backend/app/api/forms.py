@@ -561,6 +561,7 @@ def submit_public_form(
         contact_id=contact.id,
         status=SubmissionStatus.PENDING,
         workspace_id=workspace_id,
+        data={},  # Added to satisfy the database NOT NULL constraint
     )
     db.add(submission)
     db.flush()
