@@ -4,7 +4,7 @@
 >
 > Replaces: CRM · Bookings · Inbox · Forms · Inventory · Alerts · Automation · Reporting — all in one workspace.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-6366f1?style=for-the-badge)](https://corewebops-frontend-190047453514.us-central1.run.app)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-6366f1?style=for-the-badge)](https://corewebops-frontend-190047453514.asia-south1.run.app)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql)](https://postgresql.org)
