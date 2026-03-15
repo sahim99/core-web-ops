@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import Sidebar from '../../components/layout/Sidebar'
 import Topbar from '../../components/layout/Topbar'
 import MessageBubble from '../../components/inbox/MessageBubble'
@@ -23,10 +24,8 @@ import {
 import toast from 'react-hot-toast'
 
 function InboxPage() {
-  const [conversations, setConversations] = useState([])
   const [selected, setSelected] = useState(null) // conversation ID
   const [detail, setDetail] = useState(null) // full conversation object
-  const [loading, setLoading] = useState(true)
   const [replyText, setReplyText] = useState('')
   const [sending, setSending] = useState(false)
   
@@ -36,22 +35,13 @@ function InboxPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const fetchConversations = useCallback(async () => {
-    try {
-      const res = await listConversations({})
-      setConversations(res.data)
-    } catch (err) {
-      console.error('Failed to fetch conversations', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchConversations()
-    const interval = setInterval(fetchConversations, 15000)
-    return () => clearInterval(interval)
-  }, [fetchConversations])
+  const { data: convRes, isLoading: loading, refetch: fetchConversations } = useQuery({
+    queryKey: ['conversations'],
+    queryFn: () => listConversations({}),
+    refetchInterval: 15000,
+    staleTime: 15000
+  })
+  const conversations = convRes?.data || []
 
   useEffect(() => {
     if (detail) scrollToBottom()

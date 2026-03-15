@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, memo } from 'react'
+import { useState, useCallback, memo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Sidebar from '../../components/layout/Sidebar'
@@ -150,26 +151,15 @@ function Dashboard() {
   const w = DASHBOARD_CONFIG.widgets
 
   const [range, setRange] = useState(7)
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  const fetchData = useCallback(async (r) => {
-    try {
-      const res = await getOwnerOverview(r)
-      setData(res.data)
-    } catch (err) {
-      console.error('Dashboard fetch failed', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!isOwner) { setLoading(false); return }
-    fetchData(range)
-    const id = setInterval(() => fetchData(range), DASHBOARD_CONFIG.autoRefreshInterval)
-    return () => clearInterval(id)
-  }, [isOwner, range, fetchData])
+  const { data: qData, isLoading: loading, error } = useQuery({
+    queryKey: ['dashboard', range],
+    queryFn: () => getOwnerOverview(range),
+    enabled: !!isOwner,
+    staleTime: 60000,
+    refetchInterval: DASHBOARD_CONFIG.autoRefreshInterval
+  })
+  
+  const data = qData?.data || null
 
   if (!isOwner) return <AccessDenied />
   if (loading) return <DashboardSkeleton />
@@ -212,7 +202,7 @@ function Dashboard() {
                 </span>
               </div>
               <div className="flex items-center gap-2.5">
-                <RangeToggle active={range} onChange={(r) => { setRange(r); fetchData(r) }} />
+                <RangeToggle active={range} onChange={(r) => { setRange(r) }} />
                 {DASHBOARD_CONFIG.showLiveIndicator && (
                   <div className="hidden sm:flex items-center gap-1.5 bg-black/30 px-2 py-1 rounded-md border border-[var(--border-subtle)]">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)] animate-pulse" />

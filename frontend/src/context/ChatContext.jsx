@@ -28,12 +28,10 @@ import { listMessages, sendMessage as apiSendMessage } from '../api/internal_mes
 
 const ChatContext = createContext()
 
-// WebSocket URL — same host, ws:// or wss://
+// WebSocket URL using VITE_API_URL
 function getWsUrl() {
-  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const host = window.location.hostname
-  const port = '8000' // backend port
-  return `${proto}//${host}:${port}/ws/internal-messages`
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000"
+  return baseUrl.replace(/^http/, 'ws') + '/ws/internal-messages'
 }
 
 const RECONNECT_DELAYS = [1000, 2000, 5000, 10000, 10000]

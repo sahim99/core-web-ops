@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef, memo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { getRules, getEngineStatus, getFeatures } from '../../api/automation.api'
 import { getEventLogs } from '../../api/eventLogs.api'
 import { getIntegrationHealth } from '../../api/integrations.api'
@@ -65,17 +66,13 @@ function PageSkeleton() {
 
 /* ── Main Dashboard ────────────────────────────────────────────── */
 export default function AutomationDashboard() {
-  const [engineStatus, setEngineStatus] = useState(null)
   const [rules, setRules] = useState([])
-  const [logs, setLogs] = useState([])
-  const [health, setHealth] = useState(null)
   const [features, setFeatures] = useState([])
-  const [loading, setLoading] = useState(true)
-
   const rulesLoaded = useRef(false)
 
-  const loadAll = useCallback(async () => {
-    try {
+  const { data: qData, isLoading: loading, refetch: loadAll } = useQuery({
+    queryKey: ['automationDashboard'],
+    queryFn: async () => {
       const promises = [
         getEngineStatus(),
         getEventLogs({ source: 'automation', limit: 30 }),
@@ -85,34 +82,28 @@ export default function AutomationDashboard() {
         promises.push(getRules())
         promises.push(getFeatures())
       }
+      return Promise.all(promises)
+    },
+    refetchInterval: 60000,
+    staleTime: 60000
+  })
 
-      const results = await Promise.all(promises)
-      setEngineStatus(results[0])
-      setLogs(results[1])
-      setHealth(results[2])
-
-      if (!rulesLoaded.current && results[3]) {
-        setRules(results[3])
-        setFeatures(results[4] || [])
-        rulesLoaded.current = true
-      }
-    } catch (err) {
-      console.error('Automation data fetch failed', err)
-    }
-  }, [])
+  const results = qData || []
+  const engineStatus = results[0] || null
+  const logs = results[1] || []
+  const health = results[2] || null
 
   useEffect(() => {
-    setLoading(true)
-    loadAll().finally(() => setLoading(false))
-    const interval = setInterval(loadAll, 60000)
-    return () => clearInterval(interval)
-  }, [loadAll])
+    if (!rulesLoaded.current && results[3]) {
+      setRules(results[3])
+      setFeatures(results[4] || [])
+      rulesLoaded.current = true
+    }
+  }, [results])
 
   const handleRefresh = async () => {
-    setLoading(true)
     rulesLoaded.current = false
     await loadAll()
-    setLoading(false)
   }
 
   const handleRuleToggle = useCallback((key, enabled) => {

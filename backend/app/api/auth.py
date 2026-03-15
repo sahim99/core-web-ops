@@ -127,7 +127,8 @@ def login(response: Response, payload: UserLogin, background_tasks: BackgroundTa
     Login with JSON credentials. Works for both owner and staff (via email).
     Sets httpOnly session cookie.
     """
-    user = db.query(User).filter(User.email == payload.email, User.is_deleted == False).first()
+    email = payload.email.lower().strip()
+    user = db.query(User).filter(User.email == email, User.is_deleted == False).first()
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -253,9 +254,13 @@ def staff_login(response: Response, payload: StaffLogin, db: Session = Depends(g
     Staff-specific login: requires staff_id + email + password.
     Strict verification order for multi-tenant security.
     """
-    # 1. Find by staff_id
+    # 1. Normalize
+    payload_staff_id = payload.staff_id.upper().strip()
+    payload_email = payload.email.lower().strip()
+
+    # 2. Find by staff_id
     staff = db.query(User).filter(
-        User.staff_id == payload.staff_id,
+        User.staff_id == payload_staff_id,
         User.is_deleted == False,
     ).first()
     if not staff:
@@ -271,8 +276,8 @@ def staff_login(response: Response, payload: StaffLogin, db: Session = Depends(g
             detail="Invalid credentials",
         )
 
-    # 3. Verify email matches
-    if staff.email != payload.email:
+    # 4. Verify email matches
+    if staff.email.lower() != payload_email:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../hooks/useAuth'
 import { getUnreadCount } from '../api/inbox.api'
 import { getAlertCount } from '../api/alerts.api'
@@ -8,50 +9,36 @@ const GlobalDataContext = createContext()
 export function GlobalDataProvider({ children }) {
   const { user } = useAuth()
 
-  // State — only inbox + alerts (chat moved to ChatProvider)
-  const [inboxUnread, setInboxUnread] = useState(0)
-  const [alertUnread, setAlertUnread] = useState(0)
-  const [loading, setLoading] = useState(true)
+  // Fetch counts efficiently with React Query
+  const { data: inboxRes, refetch: refetchInbox } = useQuery({
+    queryKey: ['inboxUnread'],
+    queryFn: () => getUnreadCount().catch(() => ({ data: { count: 0 } })),
+    enabled: !!user,
+    refetchInterval: 30000,
+    staleTime: 30000,
+  })
+  
+  const { data: alertRes, refetch: refetchAlert, isLoading } = useQuery({
+    queryKey: ['alertUnread'],
+    queryFn: () => getAlertCount().catch(() => ({ data: { count: 0 } })),
+    enabled: !!user,
+    refetchInterval: 30000,
+    staleTime: 30000,
+  })
 
-  // Fetch counts only (no more message polling)
-  const fetchCounts = useCallback(async () => {
-    if (!user) return
-    try {
-      const [inboxRes, alertRes] = await Promise.all([
-        getUnreadCount().catch(() => ({ data: { count: 0 } })),
-        getAlertCount().catch(() => ({ data: { count: 0 } })),
-      ])
-      setInboxUnread(inboxRes.data.count)
-      setAlertUnread(alertRes.data.count)
-    } catch (err) {
-      console.error('Failed to fetch global counts', err)
-    }
-  }, [user])
+  const inboxUnread = inboxRes?.data?.count || 0
+  const alertUnread = alertRes?.data?.count || 0
 
-  // Polling for inbox/alert counts (30s)
-  useEffect(() => {
-    if (!user) {
-      setInboxUnread(0)
-      setAlertUnread(0)
-      return
-    }
-
-    const init = async () => {
-      setLoading(true)
-      await fetchCounts()
-      setLoading(false)
-    }
-    init()
-
-    const interval = setInterval(fetchCounts, 30000)
-    return () => clearInterval(interval)
-  }, [user, fetchCounts])
+  const refreshGlobalData = useCallback(() => {
+    refetchInbox()
+    refetchAlert()
+  }, [refetchInbox, refetchAlert])
 
   const value = {
     inboxUnread,
     alertUnread,
-    refreshGlobalData: fetchCounts,
-    loading,
+    refreshGlobalData,
+    loading: isLoading,
   }
 
   return (

@@ -6,6 +6,9 @@ Centralizes all dashboard metrics, single call, range-aware.
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case
 from datetime import datetime, timedelta, timezone
+from cachetools import TTLCache
+
+DASHBOARD_CACHE = TTLCache(maxsize=100, ttl=30)
 
 from app.models.booking import Booking
 from app.models.contact import Contact
@@ -34,6 +37,10 @@ def get_owner_dashboard(workspace_id: int, db: Session, range_days: int = 7) -> 
     Supports configurable date range (7, 30, 90 days).
     Returns KPIs, trends, pipeline, alerts — everything.
     """
+    cache_key = f"{workspace_id}_{range_days}"
+    if cache_key in DASHBOARD_CACHE:
+        return DASHBOARD_CACHE[cache_key]
+        
     now, range_start, prev_start = _get_range_bounds(range_days)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -344,3 +351,6 @@ def get_owner_dashboard(workspace_id: int, db: Session, range_days: int = 7) -> 
             "generated_at": now.isoformat(),
         }
     }
+    
+    DASHBOARD_CACHE[cache_key] = result
+    return result

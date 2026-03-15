@@ -7,6 +7,7 @@ import os
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -32,6 +33,9 @@ app = FastAPI(
 )
 
 # ── 1. Middleware ──────────────────────────────────────────────────
+# Order matters: last added = outermost. CORS must be outermost.
+app.add_middleware(LogRequestsMiddleware)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
@@ -39,7 +43,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(LogRequestsMiddleware)
 
 # ── 2. Exception Handlers ─────────────────────────────────────────
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)

@@ -66,9 +66,8 @@ steps:
       - '--quiet'
 
 substitutions:
-  _REGION: us-central1
+  _REGION: asia-south1
   _REPO: corewebops
-  _VITE_API_URL: https://corewebops-backend-190047453514.us-central1.run.app
-
+  _VITE_API_URL: https://corewebops-backend-190047453514.asia-south1.run.app
 options:
   logging: CLOUD_LOGGING_ONLY

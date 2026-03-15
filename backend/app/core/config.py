@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # ── CORS ────────────────────────────────────────────────
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,https://corewebops-frontend-190047453514.us-central1.run.app"
+    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,https://corewebops-frontend-190047453514.us-central1.run.app,https://corewebops-frontend-190047453514.asia-south1.run.app"
 
     # ── Server ──────────────────────────────────────────────
     PORT: int = int(os.environ.get("PORT", 8000))
